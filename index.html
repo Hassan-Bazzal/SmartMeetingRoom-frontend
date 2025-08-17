@@ -54,6 +54,32 @@
 
 </head>
 <body>
+  <script>
+  // Check if a token exists in localStorage
+const token = localStorage.getItem('token');
+if (!token) {
+    window.location.href = 'login.html';
+} else {
+    fetch('http://127.0.0.1:8000/api/me', {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Unauthorized');
+        return res.json();
+    })
+    .then(data => {
+        document.getElementById('profileName').innerText = data.name;
+        document.getElementById('profileRole').innerText = data.role;
+    })
+    .catch(err => {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+    });
+}
+</script>
 
 <!-- Sidebar -->
 <div class="sidebar">
