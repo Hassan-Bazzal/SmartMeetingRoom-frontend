@@ -417,24 +417,28 @@ function loadBookings() {
     const tbody = document.getElementById("meetingsTableBody");
     tbody.innerHTML = "";
     data.bookings.forEach(b => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${b.id}</td>
-          <td>${b.title || "Untitled"}</td>
-          <td>${b.room_id}</td>
-          <td>${new Date(b.start_time).toLocaleDateString()}</td>
-          <td>${new Date(b.start_time).toLocaleTimeString()} - ${new Date(b.end_time).toLocaleTimeString()}</td>
-          <td>${b.user_id}</td>
-          <td>
-            <button class="btn btn-danger btn-sm cancelMeetingBtn" data-id="${b.id}">
-              <i class="fas fa-times"></i> Cancel
-            </button>
-            <button class="btn btn-warning btn-sm rescheduleMeetingBtn" data-id="${b.id}">
-              <i class="fas fa-calendar-alt"></i> Reschedule
-            </button>
-          </td>
-        </tr>
-      `;
+   tbody.innerHTML += `
+  <tr>
+    <td>${b.id}</td>
+    <td>${b.title || "Untitled"}</td>
+    <td>${b.room_id}</td>
+    <td>${new Date(b.start_time).toLocaleDateString()}</td>
+    <td>${new Date(b.start_time).toLocaleTimeString()} - ${new Date(b.end_time).toLocaleTimeString()}</td>
+    <td>${b.user_id}</td>
+    <td>
+      <button class="btn btn-primary btn-sm manageAttendeesBtn" data-id="${b.id}">
+        👥 Manage Attendees
+      </button>
+      <button class="btn btn-danger btn-sm cancelMeetingBtn" data-id="${b.id}">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button class="btn btn-warning btn-sm rescheduleMeetingBtn" data-id="${b.id}">
+        <i class="fas fa-calendar-alt"></i> Reschedule
+      </button>
+    </td>
+  </tr>
+`;
+
     });
 
     
@@ -465,6 +469,15 @@ document.getElementById("meetingsTableBody").addEventListener("click", async (e)
     document.getElementById("rescheduleBookingId").value = bookingId;
     const modal = new bootstrap.Modal(document.getElementById("rescheduleModal"));
     modal.show();
+  }
+  // ✅ Manage attendees
+  if (e.target.closest(".manageAttendeesBtn")) {
+    const bookingId = e.target.closest(".manageAttendeesBtn").dataset.id;
+    currentBookingId = bookingId;   
+    loadAttendees();
+
+   
+    document.querySelector(".card.my-4").scrollIntoView({ behavior: "smooth" });
   }
 });
 
