@@ -85,29 +85,6 @@ if (!token1) {
     });
 }
 </script>
-<script>
-  // Run as soon as the page loads
-  document.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("token");
-    const employee = JSON.parse(localStorage.getItem("employee") || "{}");
-
-    // If no token or employee info, redirect to login
-    if (!token || !employee.role) {
-      window.location.href = "login.html";
-      return;
-    }
-
-    // If role is not admin, redirect to user dashboard
-    if (employee.role !== "admin") {
-      window.location.href = "user.html";
-      return;
-    }
-
-    // ✅ At this point, admin is verified → allow access
-    console.log("Admin verified. Welcome!");
-  });
-</script>
-
 
 <!-- Sidebar -->
 <div class="sidebar">
@@ -117,12 +94,10 @@ if (!token1) {
   <h3 class="text-center py-3">Internal System</h3>
   <a href="#dashboard"><i class="fas fa-home me-2"></i> Dashboard</a>
   <a href="#rooms"><i class="fas fa-door-open me-2"></i> Rooms</a>
-  <a href="#manageRooms" id="manageRoomsLink"><i class="fas fa-cogs me-2"></i> Room Management</a>
   <a href="#booking"><i class="fas fa-calendar-check me-2"></i> Booking</a>
   <a href="#meetings"><i class="fas fa-file-alt me-2"></i> Meetings</a>
   <a href="#calendar"><i class="fas fa-calendar-alt me-2"></i> Calendar</a>
   <a href="#profile"><i class="fas fa-user me-2"></i> Profile</a>
-    <a href="#users"><i class="fas fa-users me-2"></i> Users</a>
     <a href="#notifications" id="notificationsLink">
   <i class="fas fa-bell me-2"></i> Notifications 
   <span class="badge bg-light text-dark ms-2" id="notifCount">0</span>
@@ -247,63 +222,6 @@ document.addEventListener("DOMContentLoaded", function () {
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-
-
-
-  <!-- Manage Rooms (Admin only) -->
-<div id="manageRooms" class="my-5">
-  <h2 class="mb-4">Manage Rooms</h2>
-  
-  <!-- Add Room Form -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <h5>Add New Room</h5>
-      <form id="addRoomForm">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label">Room Name</label>
-            <input type="text" class="form-control" id="roomName" required>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Capacity</label>
-            <input type="number" class="form-control" id="roomCapacity" required>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Location</label>
-            <input type="text" class="form-control" id="roomLocation">
-          </div>
-          <div class="col-md-12">
-            <label class="form-label">Features</label>
-            <input type="text" class="form-control" id="roomFeatures" placeholder="Projector, Whiteboard, etc.">
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary mt-3">Add Room</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Rooms Table -->
-  <div class="card">
-    <div class="card-body">
-      <h5>Existing Rooms</h5>
-      <div class="table-responsive">
-        <table class="table table-striped" id="roomsTable">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Capacity</th>
-              <th>Location</th>
-              <th>Features</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
 
 
   <!-- Booking -->
@@ -473,7 +391,7 @@ function loadBookings() {
     });
 
     
-   // Attach Cancel and Reschedule using delegation
+   //  Cancel and Reschedule
 document.getElementById("meetingsTableBody").addEventListener("click", async (e) => {
   if (e.target.closest(".cancelMeetingBtn")) {
     const bookingId = e.target.closest(".cancelMeetingBtn").dataset.id;
@@ -501,7 +419,7 @@ document.getElementById("meetingsTableBody").addEventListener("click", async (e)
     const modal = new bootstrap.Modal(document.getElementById("rescheduleModal"));
     modal.show();
   }
-  // ✅ Create Minute
+  //  Create Minute
 if (e.target.closest(".createMinuteBtn")) {
   const bookingId = e.target.closest(".createMinuteBtn").dataset.id;
   document.getElementById("minuteBookingId").value = bookingId; // auto-fill hidden field
@@ -509,7 +427,7 @@ if (e.target.closest(".createMinuteBtn")) {
   modal.show();
 }
 
-  // ✅ Manage attendees
+  //  Manage attendees
   if (e.target.closest(".manageAttendeesBtn")) {
     const bookingId = e.target.closest(".manageAttendeesBtn").dataset.id;
     currentBookingId = bookingId;   
@@ -1175,48 +1093,7 @@ document.addEventListener("DOMContentLoaded", function() {
       </div>
     </div>
   </div>
-    <div id="users" class="my-5">
-  <h2 class="mb-4">Register New User</h2>
-
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <form id="registerForm">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label for="newName" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="newName" placeholder="Enter full name" required>
-          </div>
-          <div class="col-md-6">
-            <label for="newEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" id="newEmail" placeholder="Enter email" required>
-          </div>
-          <div class="col-md-6">
-            <label for="newPhone" class="form-label">Phone</label>
-            <input type="tel" class="form-control" id="newPhone" placeholder="Enter phone number" required>
-          </div>
-          <div class="col-md-6">
-            <label for="newRole" class="form-label">Role</label>
-            <select id="newRole" class="form-select" required>
-              <option value="" selected disabled>Choose role</option>
-              <option value="employee">Employee</option>
-              <option value="admin">Admin</option>
-              <option value="guest">Guest</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label for="newPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="newPassword" placeholder="Enter password" required>
-          </div>
-          <div class="col-md-6">
-            <label for="confirmPassword" class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password" required>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary mt-3">Register User</button>
-      </form>
-    </div>
-  </div>
-</div>
+    
 <!-- Notifications Section -->
 <div id="notifications" class="container mt-4">
   <h4 class="mb-3"><i class="fas fa-bell"></i> Notifications</h4>
@@ -1273,7 +1150,6 @@ async function loadNotifications() {
 }
 
 document.getElementById("notificationsLink").addEventListener("click", function() {
-  // just reload notifications when sidebar link is clicked
   loadNotifications();
 });
 
@@ -1301,7 +1177,7 @@ document.addEventListener("DOMContentLoaded", loadNotifications);
 </div>
 <script>
 document.getElementById('confirmLogout').addEventListener('click', function () {
-    // Get the token from localStorage (or sessionStorage depending on your setup)
+    // Get the token from localStorage 
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -1373,94 +1249,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     calendar.render();
 });
-document.addEventListener('DOMContentLoaded', function () {
-    const token = localStorage.getItem('token');
-    const roomsTableBody = document.querySelector('#roomsTable tbody');
-    const addRoomForm = document.getElementById('addRoomForm');
 
-    // Fetch and display rooms
-    function loadRooms() {
-        fetch('http://127.0.0.1:8000/api/rooms', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            roomsTableBody.innerHTML = '';
-            data.rooms.forEach((room, index) => {
-                roomsTableBody.innerHTML += `
-                  <tr>
-                    <td>${index + 1}</td>
-                    <td><input type="text" class="form-control form-control-sm" value="${room.name}" data-id="${room.id}" data-field="name"></td>
-                    <td><input type="number" class="form-control form-control-sm" value="${room.capacity}" data-id="${room.id}" data-field="capacity"></td>
-                    <td><input type="text" class="form-control form-control-sm" value="${room.location || ''}" data-id="${room.id}" data-field="location"></td>
-                    <td><input type="text" class="form-control form-control-sm" value="${room.features || ''}" data-id="${room.id}" data-field="features"></td>
-                    <td>
-                      <button class="btn btn-success btn-sm save-room" data-id="${room.id}">Save</button>
-                      <button class="btn btn-danger btn-sm delete-room" data-id="${room.id}">Delete</button>
-                    </td>
-                  </tr>
-                `;
-            });
-        });
-    }
-
-    // Add new room
-    addRoomForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const body = {
-            name: document.getElementById('roomName').value,
-            capacity: document.getElementById('roomCapacity').value,
-            location: document.getElementById('roomLocation').value,
-            features: document.getElementById('roomFeatures').value
-        };
-
-        fetch('http://127.0.0.1:8000/api/rooms', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        })
-        .then(res => res.json())
-        .then(() => {
-            addRoomForm.reset();
-            loadRooms();
-        });
-    });
-
-    // Delegate update/delete actions
-    roomsTableBody.addEventListener('click', function (e) {
-        if (e.target.classList.contains('save-room')) {
-            const id = e.target.dataset.id;
-            const inputs = document.querySelectorAll(`[data-id="${id}"]`);
-            const body = {};
-            inputs.forEach(input => body[input.dataset.field] = input.value);
-
-            fetch(`http://127.0.0.1:8000/api/rooms/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(body)
-            }).then(() => loadRooms());
-        }
-
-        if (e.target.classList.contains('delete-room')) {
-            const id = e.target.dataset.id;
-            if (confirm('Are you sure you want to delete this room?')) {
-                fetch(`http://127.0.0.1:8000/api/rooms/${id}`, {
-                    method: 'DELETE',
-                    headers: { Authorization: `Bearer ${token}` }
-                }).then(() => loadRooms());
-            }
-        }
-    });
-
-    // Initial load
-    loadRooms();
-});
 
 
 
