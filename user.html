@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   <i class="bi bi-door-open me-2"></i>${room.name}
                 </h5>
                 <ul class="list-unstyled mb-3">
+                   <li><i class="bi bi-key-fill text-dark me-2"></i>ID: <strong>${room.id}</strong></li>
                   <li><i class="bi bi-people-fill text-secondary me-2"></i>Capacity: <strong>${room.capacity}</strong></li>
                   <li><i class="bi bi-geo-alt-fill text-danger me-2"></i>Location: ${room.location ?? 'N/A'}</li>
                   <li><i class="bi bi-laptop text-success me-2"></i>Features: ${room.features ?? 'None'}</li>
@@ -1057,42 +1058,138 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 
-
-  <!-- Profile -->
-  <div id="profile" class="my-5 container">
-    <h2 class="mb-4">My Profile</h2>
-    <div class="row">
-      <div class="col-lg-4 mb-4">
-        <div class="card">
-          <div class="card-body text-center">
-            <h5 id="profileName">John Doe</h5>
-            <p id="profileRole">Employee</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-8">
-        <div class="card">
-          <div class="card-body">
-            <form id="profileForm">
-              <div class="mb-3">
-                <label for="name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="name" value="John Doe">
-              </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" value="john.doe@example.com" readonly>
-              </div>
-              <div class="mb-3">
-                <label for="phone" class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" id="phone" value="+961 70 000 000">
-              </div>
-              <button type="submit" class="btn btn-primary">Save Changes</button>
-            </form>
+<!-- Profile Section -->
+<div id="profile" class="container my-5">
+  <div class="row justify-content-center">
+    <!-- Profile Sidebar -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body text-center p-4">
+          <h4 id="profileName" class="fw-bold mb-1">John Doe</h4>
+          <span class="badge bg-primary" id="profileRole">Employee</span>
+          <hr class="my-4">
+          <div class="text-muted small">
+            <i class="bi bi-envelope me-2"></i>
+            <span id="profileEmail">john.doe@example.com</span>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Profile Form -->
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4">
+          <h5 class="mb-0">Edit Profile</h5>
+        </div>
+        <div class="card-body p-4">
+          <form id="profileForm">
+            <div class="mb-3">
+              <label for="email" class="form-label fw-semibold">Email</label>
+              <input type="email" class="form-control rounded-3" id="email" readonly />
+            </div>
+            <hr>
+            <h6 class="fw-bold mb-3">Change Password</h6>
+            <div class="mb-3">
+              <label for="oldPassword" class="form-label fw-semibold">Old Password</label>
+              <input type="password" class="form-control rounded-3" id="oldPassword" placeholder="Enter old password">
+            </div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label fw-semibold">New Password</label>
+              <input type="password" class="form-control rounded-3" id="newPassword" placeholder="Enter new password">
+            </div>
+            <div class="mb-3">
+              <label for="newPassword_confirmation" class="form-label fw-semibold">Confirm New Password</label>
+              <input type="password" class="form-control rounded-3" id="newPassword_confirmation" placeholder="Confirm new password">
+            </div>
+            <div class="d-flex justify-content-end">
+              <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
+              <button type="submit" class="btn btn-primary shadow-sm">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
+
+<script>
+async function loadProfile() {
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/me', {
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+    });
+    if (!response.ok) throw new Error('Failed to fetch profile');
+
+    const user = await response.json();
+
+    // Fill sidebar
+    document.getElementById('profileName').innerText = user.name;
+    document.getElementById('profileRole').innerText = user.role;
+    document.getElementById('profileEmail').innerText = user.email;
+    // Fill form
+    document.getElementById('email').value = user.email;
+
+  } catch (error) {
+    console.error(error);
+    alert('Could not load profile.');
+  }
+}
+
+document.getElementById('profileForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  try {
+    const oldPassword = document.getElementById('oldPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const newPassword_confirmation = document.getElementById('newPassword_confirmation').value;
+    const email = document.getElementById('email').value;
+
+    if (oldPassword && newPassword) {
+      const passwordResponse = await fetch('http://127.0.0.1:8000/api/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify({
+          email,
+          oldPassword,
+          newPassword,
+          newPassword_confirmation
+        })
+      });
+
+      const result = await passwordResponse.json();
+
+      if (!passwordResponse.ok) throw new Error(result.message || 'Password change failed');
+
+      // Reset password fields only
+      document.getElementById('oldPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('newPassword_confirmation').value = '';
+
+      alert(result.message || 'Password changed successfully!');
+    } else {
+      alert('Please fill in both old and new password fields.');
+    }
+    localStorage.removeItem('token');
+localStorage.removeItem('user_id');
+window.location.href = '/login.html'; 
+
+
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
+});
+
+
+// Load profile on page load
+loadProfile();
+</script>
+
+
     
 <!-- Notifications Section -->
 <div id="notifications" class="container mt-4">
@@ -1402,76 +1499,6 @@ function setMeeting(id) {
       }
     }
   });
-  // Fetch profile data from backend
-async function loadProfile() {
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/employees", {
-      method: "GET",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("token")}`
-      }
-    });
-
-    if (!response.ok) throw new Error("Failed to fetch profile");
-
-    const profile = await response.json();
-
-    // Fill in profile display
-    document.getElementById("profileName").textContent = profile.name;
-    document.getElementById("profileRole").textContent = profile.role;
-
-    // Fill in editable form
-    document.getElementById("name").value = profile.name;
-    document.getElementById("email").value = profile.email;
-    document.getElementById("phone").value = profile.phone;
-
-  } catch (error) {
-    console.error(error);
-    alert("Could not load profile. Check console for details.");
-  }
-}
-
-async function updateProfile(event) {
-  event.preventDefault();
-
-  const updatedProfile = {
-    name: document.getElementById("name").value,
-    phone: document.getElementById("phone").value
-    // email & role are readonly → not updated
-  };
-
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/employees", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("token")}`
-      },
-      body: JSON.stringify(updatedProfile)
-    });
-
-    if (!response.ok) throw new Error("Failed to update profile");
-
-    const result = await response.json();
-    alert("Profile updated successfully!");
-
-    // Update display name instantly
-    document.getElementById("profileName").textContent = updatedProfile.name;
-
-  } catch (error) {
-    console.error(error);
-    alert("Could not update profile. Check console for details.");
-  }
-}
-
-// Load profile when page loads
-window.addEventListener("DOMContentLoaded", loadProfile);
-
-// Handle form submission
-document.getElementById("profileForm").addEventListener("submit", updateProfile);
-
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
