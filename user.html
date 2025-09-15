@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-  <!-- Booking -->
+ <!-- Booking -->
 <div id="booking" class="my-5">
   <h2>Book a Room</h2>
   <form id="bookingForm" class="mt-3">
@@ -247,13 +247,16 @@ document.addEventListener("DOMContentLoaded", function () {
         <input type="time" id="bookingEnd" class="form-control" required>
       </div>
       <div class="col-md-12">
+        <label for="bookingTitle" class="form-label">Title</label>
+        <input type="text" id="bookingTitle" class="form-control" placeholder="Enter meeting title" required>
+      </div>
+      <div class="col-md-12">
         <label for="agenda" class="form-label">Agenda</label>
         <textarea id="agenda" class="form-control"></textarea>
       </div>
     </div>
     <button type="submit" class="btn btn-primary mt-3">Book Room</button>
   </form>
-  
 </div>
 <!-- Reschedule Modal -->
 <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
@@ -291,7 +294,8 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </div>
 
-<script>const token4 = localStorage.getItem("token");
+<script>
+const token4 = localStorage.getItem("token");
 
 // Load rooms into booking form
 function loadRooms() {
@@ -319,6 +323,7 @@ document.getElementById("bookingForm").addEventListener("submit", function(e) {
   const date = document.getElementById("bookingDate").value;
   const start = document.getElementById("bookingStart").value;
   const end = document.getElementById("bookingEnd").value;
+  const title = document.getElementById("bookingTitle").value;
   const agenda = document.getElementById("agenda").value;
 
   const startDateTime = `${date} ${start}:00`;
@@ -336,7 +341,7 @@ document.getElementById("bookingForm").addEventListener("submit", function(e) {
       end_time: endDateTime,
       status: "pending",
       agenda: agenda,
-      title: "Meeting"
+      title: title
     })
   })
   .then(async res => {
@@ -352,6 +357,7 @@ document.getElementById("bookingForm").addEventListener("submit", function(e) {
   })
   .catch(err => console.error(err));
 });
+
 
 // Load bookings into table
 function loadBookings() {

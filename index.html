@@ -377,7 +377,8 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </div>
 
-<script>const token4 = localStorage.getItem("token");
+<script>
+const token4 = localStorage.getItem("token");
 
 // Load rooms into booking form
 function loadRooms() {
@@ -1598,6 +1599,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.json())
         .then(() => {
             addRoomForm.reset();
+            alert('Room added successfully');
             loadRooms();
         });
     });
@@ -1618,6 +1620,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify(body)
             }).then(() => loadRooms());
+            alert('Room updated successfully');
         }
 
         if (e.target.classList.contains('delete-room')) {
@@ -1627,6 +1630,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     method: 'DELETE',
                     headers: { Authorization: `Bearer ${token}` }
                 }).then(() => loadRooms());
+                alert('Room deleted successfully');
             }
         }
     });
